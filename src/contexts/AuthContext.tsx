@@ -42,7 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       // In real implementation, this would call your Google Apps Script endpoint
       // to check if the user is authenticated
-      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/auth/check', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbxQcXqR_Ki52d2LDRQzdPNxM_oE68y_QgJMGuTZdQqkNSApu6wtEdB9YROgVdZ25DVT/exec/auth/check', {
         credentials: 'include'
       });
       
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signIn = async () => {
     try {
       // Redirect to Google Apps Script authentication endpoint
-      window.location.href = 'YOUR_GOOGLE_APPS_SCRIPT_URL/auth/signin';
+      window.location.href = 'https://script.google.com/macros/s/AKfycbxQcXqR_Ki52d2LDRQzdPNxM_oE68y_QgJMGuTZdQqkNSApu6wtEdB9YROgVdZ25DVT/exec/auth/signin';
     } catch (error) {
       console.error('Sign in failed:', error);
     }
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signOut = () => {
     setUser(null);
     // Clear any stored tokens and redirect to sign out endpoint
-    window.location.href = 'YOUR_GOOGLE_APPS_SCRIPT_URL/auth/signout';
+    window.location.href = 'https://script.google.com/macros/s/AKfycbxQcXqR_Ki52d2LDRQzdPNxM_oE68y_QgJMGuTZdQqkNSApu6wtEdB9YROgVdZ25DVT/exec/auth/signout';
   };
 
   const value = {
