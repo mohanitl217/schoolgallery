@@ -1,6 +1,6 @@
 // API utility functions for communicating with Google Apps Script
 
-const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your deployed Apps Script URL
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQcXqR_Ki52d2LDRQzdPNxM_oE68y_QgJMGuTZdQqkNSApu6wtEdB9YROgVdZ25DVT/exec'; // Replace with your deployed Apps Script URL
 
 interface ApiResponse<T = any> {
   success: boolean;
