@@ -1,57 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
-import { Gallery } from './components/Gallery';
-import { Upload } from './components/Upload';
-import { FolderManager } from './components/FolderManager';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { DriveProvider } from './contexts/DriveContext';
-import { LoadingScreen } from './components/LoadingScreen';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-function AppContent() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<'gallery' | 'upload' | 'manage'>('gallery');
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center p-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">School Photo Gallery</h1>
-          <p className="text-gray-600 mb-8">Sign in with Google to access your school photos</p>
-          <button
-            onClick={() => window.location.href = 'YOUR_GOOGLE_APPS_SCRIPT_URL'}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200"
-          >
-            Sign in with Google
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <DriveProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <Header activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="container mx-auto px-4 py-8">
-          {activeTab === 'gallery' && <Gallery />}
-          {activeTab === 'upload' && <Upload />}
-          {activeTab === 'manage' && <FolderManager />}
-        </main>
-      </div>
-    </DriveProvider>
-  );
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  picture: string;
 }
 
-function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  signIn: () => Promise<void>;
+  signOut: () => void;
 }
 
-export default App;
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for existing authentication
+    // For demo purposes, simulate authentication after a short delay
+    setTimeout(() => {
+      setUser({
+        id: 'demo-user',
+        name: 'Demo User',
+        email: 'demo@school.edu',
+        picture: 'https://ui-avatars.com/api/?name=Demo+User&background=3B82F6&color=fff'
+      });
+      setIsLoading(false);
+    }, 1500);
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      // In real implementation, this would call your Google Apps Script endpoint
+      // to check if the user is authenticated
+      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/auth/check', {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signIn = async () => {
+    try {
+      // For demo purposes, simulate sign in
+      setIsLoading(true);
+      setTimeout(() => {
+        setUser({
+          id: 'demo-user',
+          name: 'Demo User',
+          email: 'demo@school.edu',
+          picture: 'https://ui-avatars.com/api/?name=Demo+User&background=3B82F6&color=fff'
+        });
+        setIsLoading(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Sign in failed:', error);
+    }
+  };
+
+  const signOut = () => {
+    setUser(null);
+    // For demo purposes, just clear the user
+    console.log('User signed out');
+  };
+
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    signIn,
+    signOut,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
