@@ -35,14 +35,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     // Check for existing authentication
-    checkAuthStatus();
+    // For demo purposes, simulate authentication after a short delay
+    setTimeout(() => {
+      setUser({
+        id: 'demo-user',
+        name: 'Demo User',
+        email: 'demo@school.edu',
+        picture: 'https://ui-avatars.com/api/?name=Demo+User&background=3B82F6&color=fff'
+      });
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   const checkAuthStatus = async () => {
     try {
       // In real implementation, this would call your Google Apps Script endpoint
       // to check if the user is authenticated
-      const response = await fetch('https://script.google.com/macros/s/AKfycbxQcXqR_Ki52d2LDRQzdPNxM_oE68y_QgJMGuTZdQqkNSApu6wtEdB9YROgVdZ25DVT/exec/auth/check', {
+      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/auth/check', {
         credentials: 'include'
       });
       
@@ -59,8 +68,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signIn = async () => {
     try {
-      // Redirect to Google Apps Script authentication endpoint
-      window.location.href = 'https://script.google.com/macros/s/AKfycbxQcXqR_Ki52d2LDRQzdPNxM_oE68y_QgJMGuTZdQqkNSApu6wtEdB9YROgVdZ25DVT/exec/auth/signin';
+      // For demo purposes, simulate sign in
+      setIsLoading(true);
+      setTimeout(() => {
+        setUser({
+          id: 'demo-user',
+          name: 'Demo User',
+          email: 'demo@school.edu',
+          picture: 'https://ui-avatars.com/api/?name=Demo+User&background=3B82F6&color=fff'
+        });
+        setIsLoading(false);
+      }, 1000);
     } catch (error) {
       console.error('Sign in failed:', error);
     }
@@ -68,8 +86,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signOut = () => {
     setUser(null);
-    // Clear any stored tokens and redirect to sign out endpoint
-    window.location.href = 'https://script.google.com/macros/s/AKfycbxQcXqR_Ki52d2LDRQzdPNxM_oE68y_QgJMGuTZdQqkNSApu6wtEdB9YROgVdZ25DVT/exec/auth/signout';
+    // For demo purposes, just clear the user
+    console.log('User signed out');
   };
 
   const value = {
