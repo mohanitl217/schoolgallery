@@ -112,98 +112,60 @@ export function DriveProvider({ children }: DriveProviderProps) {
   };
 
   const uploadFiles = async (files: File[], folderId?: string) => {
-    // In real implementation, this would call your Google Apps Script endpoint
-    const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append(`file${index}`, file);
-    });
+    // Demo implementation - simulate upload
+    console.log('Demo: Uploading files:', files.map(f => f.name));
     
-    if (folderId) {
-      formData.append('folderId', folderId);
-    }
-
-    try {
-      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/upload', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      // Reload files after upload
-      loadMockData();
-    } catch (error) {
-      console.error('Upload error:', error);
-      throw error;
-    }
+    // Simulate upload delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Add uploaded files to the mock data
+    const newFiles = files.map((file, index) => ({
+      id: `uploaded-${Date.now()}-${index}`,
+      name: file.name,
+      type: file.type.startsWith('image/') ? 'image' as const : 'video' as const,
+      url: URL.createObjectURL(file),
+      thumbnailUrl: URL.createObjectURL(file),
+      createdAt: new Date().toISOString().split('T')[0],
+      size: formatFileSize(file.size)
+    }));
+    
+    setFiles(prev => [...prev, ...newFiles]);
   };
 
   const createFolder = async (name: string, parentId?: string) => {
-    try {
-      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/folders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, parentId }),
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create folder');
-      }
-
-      // Reload folders after creation
-      loadMockData();
-    } catch (error) {
-      console.error('Create folder error:', error);
-      throw error;
-    }
+    // Demo implementation
+    console.log('Demo: Creating folder:', name, 'in parent:', parentId);
+    
+    const newFolder = {
+      id: `folder-${Date.now()}`,
+      name,
+      parentId,
+      fileCount: 0
+    };
+    
+    setFolders(prev => [...prev, newFolder]);
   };
 
   const deleteFolder = async (folderId: string) => {
-    try {
-      const response = await fetch(`YOUR_GOOGLE_APPS_SCRIPT_URL/folders/${folderId}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete folder');
-      }
-
-      // Reload folders after deletion
-      loadMockData();
-    } catch (error) {
-      console.error('Delete folder error:', error);
-      throw error;
-    }
+    // Demo implementation
+    console.log('Demo: Deleting folder:', folderId);
+    setFolders(prev => prev.filter(f => f.id !== folderId));
   };
 
   const renameFolder = async (folderId: string, newName: string) => {
-    try {
-      const response = await fetch(`YOUR_GOOGLE_APPS_SCRIPT_URL/folders/${folderId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: newName }),
-        credentials: 'include'
-      });
+    // Demo implementation
+    console.log('Demo: Renaming folder:', folderId, 'to:', newName);
+    setFolders(prev => prev.map(f => 
+      f.id === folderId ? { ...f, name: newName } : f
+    ));
+  };
 
-      if (!response.ok) {
-        throw new Error('Failed to rename folder');
-      }
-
-      // Reload folders after rename
-      loadMockData();
-    } catch (error) {
-      console.error('Rename folder error:', error);
-      throw error;
-    }
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const value = {
